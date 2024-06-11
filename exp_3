@@ -1,0 +1,125 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#define SIZE 5
+int isCharInKeyMatrix(char keyMatrix[SIZE][SIZE], char ch) {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            if (keyMatrix[i][j] == ch) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+void prepareKeyMatrix(char key[], char keyMatrix[SIZE][SIZE]) {
+    int i, j, k;
+    char *ptr;
+    int keyLen = strlen(key);
+    int alphabetUsed[26] = {0};
+    char currentChar;
+    for (i = 0; i < SIZE; i++) {
+        for (j = 0; j < SIZE; j++) {
+            keyMatrix[i][j] = 0;
+        }
+    }
+    ptr = key;
+    i = 0;
+    j = 0;
+    for (k = 0; k < keyLen; k++) {
+        currentChar = tolower(*ptr);
+        if (currentChar == 'j') currentChar = 'i'; 
+        if (!alphabetUsed[currentChar - 'a']) {
+            keyMatrix[i][j] = currentChar;
+            alphabetUsed[currentChar - 'a'] = 1;
+            j++;
+            if (j == SIZE) {
+                j = 0;
+                i++;
+            }
+        }
+        ptr++;
+    }
+    for (currentChar = 'a'; currentChar <= 'z'; currentChar++) {
+        if (currentChar == 'j') continue; // Skip 'j'
+        if (!alphabetUsed[currentChar - 'a']) {
+            keyMatrix[i][j] = currentChar;
+            alphabetUsed[currentChar - 'a'] = 1;
+            j++;
+            if (j == SIZE) {
+                j = 0;
+                i++;
+            }
+        }
+    }
+}
+void findPosition(char keyMatrix[SIZE][SIZE], char ch, int *row, int *col) {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            if (keyMatrix[i][j] == ch) {
+                *row = i;
+                *col = j;
+                return;
+            }
+        }
+    }
+}
+void encryptPair(char keyMatrix[SIZE][SIZE], char a, char b) {
+    int row1, col1, row2, col2;
+    findPosition(keyMatrix, a, &row1, &col1);
+    findPosition(keyMatrix, b, &row2, &col2);
+    if (row1 == row2) { // Same row
+        printf("%c%c ", keyMatrix[row1][(col1 + 1) % SIZE], keyMatrix[row2][(col2 + 1) % SIZE]);
+    } else if (col1 == col2) { // Same column
+        printf("%c%c ", keyMatrix[(row1 + 1) % SIZE][col1], keyMatrix[(row2 + 1) % SIZE][col2]);
+    } else { // Forming rectangle
+        printf("%c%c ", keyMatrix[row1][col2], keyMatrix[row2][col1]);
+    }
+}
+int main() {
+    char key[] = "keyword"; 
+    char plaintext[] = "meet me tomorrow"; 
+    char keyMatrix[SIZE][SIZE];
+    int i;
+    prepareKeyMatrix(key, keyMatrix);
+    printf("Key Matrix:\n");
+    for (i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            printf("%c ", keyMatrix[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+    printf("Plaintext: %s\n", plaintext);
+    printf("Encrypted Text: ");
+    for (i = 0; i < strlen(plaintext); i += 2) {
+        if (!isalpha(plaintext[i])) {
+            i--;
+            continue;
+        }
+        char a = tolower(plaintext[i]);
+        char b = tolower(plaintext[i + 1]);
+        if (a == 'j') a = 'i';
+        if (b == 'j') b = 'i';
+        if (!isalpha(b)) {
+            encryptPair(keyMatrix, a, 'x');
+        } else if (a == b) {
+            encryptPair(keyMatrix, a, 'x');
+            i--;
+        } else {
+            encryptPair(keyMatrix, a, b);
+        }
+    }
+    return 0;
+}
+
+output:
+Key Matrix:
+k e y w o
+r d a b c
+f g h i l
+m n p q s
+t u v x z
+
+Plaintext: meet me tomorrow
+Encrypted Text: nk ku nk zk sk bt ck bw
