@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+void removeDuplicates(char* str) {
+    int hash[256] = {0};
+    int currentIndex = 0;
+    int lastIndex = 0;
+    while (str[currentIndex]) {
+        char temp = str[currentIndex];
+        if (hash[temp] == 0) {
+            hash[temp] = 1;
+            str[lastIndex++] = str[currentIndex];
+        }
+        currentIndex++;
+    }
+    str[lastIndex] = '\0';
+}
+void generateCipherSequence(char* keyword, char* cipher) {
+    char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    int alphaIndex = 0;
+    strcpy(cipher, keyword);
+    removeDuplicates(cipher);
+    int cipherLen = strlen(cipher);
+    for (int i = 0; i < 26; i++) {
+        if (!strchr(cipher, alphabet[i])) {
+            cipher[cipherLen++] = alphabet[i];
+        }
+    }
+    cipher[cipherLen] = '\0';
+}
+void encrypt(char* plaintext, char* cipher, char* ciphertext) {
+    char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    for (int i = 0; plaintext[i]; i++) {
+        if (isalpha(plaintext[i])) {
+            char upperChar = toupper(plaintext[i]);
+            int index = strchr(alphabet, upperChar) - alphabet;
+            ciphertext[i] = isupper(plaintext[i]) ? cipher[index] : tolower(cipher[index]);
+        } else {
+            ciphertext[i] = plaintext[i]; 
+        }
+    }
+    ciphertext[strlen(plaintext)] = '\0';
+}
+int main() {
+    char keyword[100], plaintext[100], cipher[27], ciphertext[100];
+    
+    printf("Enter the keyword: ");
+    scanf("%s", keyword);
+    printf("Enter the plaintext message: ");
+    scanf(" %[^\n]", plaintext);
+    for (int i = 0; keyword[i]; i++) {
+        keyword[i] = toupper(keyword[i]);
+    }
+    generateCipherSequence(keyword, cipher);
+    printf("Generated cipher sequence: %s\n", cipher);
+    encrypt(plaintext, cipher, ciphertext);
+    printf("Encrypted message: %s\n", ciphertext);
+    return 0;
+}
+
+output:
+Enter the keyword: bestfrinds
+Enter the plaintext message: meet me at tommorrow
+Generated cipher sequence: BESTFRINDACGHJKLMOPQUVWXYZ
+Encrypted message: hffq hf bq qkhhkookw
