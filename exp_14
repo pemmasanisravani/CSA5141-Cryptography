@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MOD 26
+void encrypt(char *plaintext, int *key, int keyLen, char *ciphertext);
+void decrypt(char *ciphertext, int *key, int keyLen, char *plaintext);
+void generateKey(char *plaintext, char *ciphertext, int *key, int keyLen);
+int main() {
+    char plaintext[] = "sendmoremoney";
+    int key[] = {9, 0, 17, 23, 15, 21, 14, 11, 11, 2, 8, 9};
+    int keyLen = sizeof(key) / sizeof(key[0]);
+    char ciphertext[100];
+    char decryptedText[100];
+    encrypt(plaintext, key, keyLen, ciphertext);
+    printf("Encrypted Message: %s\n", ciphertext);
+    decrypt(ciphertext, key, keyLen, decryptedText);
+    printf("Decrypted Message: %s\n", decryptedText);
+    return 0;
+}
+void encrypt(char *plaintext, int *key, int keyLen, char *ciphertext) {
+    int len = strlen(plaintext);
+    for (int i = 0; i < len; i++) {
+        int shift = key[i % keyLen];
+        ciphertext[i] = ((plaintext[i] - 'a' + shift) % MOD) + 'a';
+    }
+    ciphertext[len] = '\0';
+}
+void decrypt(char *ciphertext, int *key, int keyLen, char *plaintext) {
+    int len = strlen(ciphertext);
+    for (int i = 0; i < len; i++) {
+        int shift = key[i % keyLen];
+        plaintext[i] = ((ciphertext[i] - 'a' - shift + MOD) % MOD) + 'a';
+    }
+    plaintext[len] = '\0';
+}
+
+output:
+Encrypted Message: beeabjfpxqvnh
+Decrypted Message: sendmoremoney
